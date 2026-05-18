@@ -3,8 +3,8 @@ const router = express.Router();
 const emailjs = require('@emailjs/nodejs');
 
 emailjs.init({
-  publicKey: 'lUYicfMscMJKE1eKj', 
-  privateKey: 'xn7rq4KVbFcFcGqWWKuMC',
+  publicKey: process.env.EMAILJS_PUBLIC_KEY,
+  privateKey: process.env.EMAILJS_PRIVATE_KEY,
 });
 
 router.post('/send-email', async (req, res) => {
@@ -19,14 +19,22 @@ router.post('/send-email', async (req, res) => {
       name,
       email,
       message,
+      // You can add more fields if needed
     };
 
-    await emailjs.send('service_jzre4ps', 'template_9g5qb7p', templateParams);
+    await emailjs.send(
+      process.env.EMAILJS_SERVICE_ID, 
+      process.env.EMAILJS_TEMPLATE_ID, 
+      templateParams
+    );
 
-    res.status(200).json({ message: 'Email sent successfully' });
+    res.status(200).json({ message: 'Email sent successfully!' });
   } catch (error) {
     console.error('EmailJS error:', error);
-    res.status(500).json({ error: 'Failed to send email' });
+    res.status(500).json({ 
+      error: 'Failed to send email',
+      details: error.text || error.message 
+    });
   }
 });
 
