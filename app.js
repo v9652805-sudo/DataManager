@@ -14,7 +14,7 @@ const app = express();
 const corsOriginsEnv = process.env.CORS_ORIGINS || "*";
 const corsOrigins = corsOriginsEnv === "*" ? "*" : corsOriginsEnv.split(",");
 if (!process.env.CORS_ORIGINS) {
-  console.warn('Warning: CORS_ORIGINS environment variable not set. Defaulting to "*"');
+  console.warn('Warning: CORS_ORIGINS environment variable not set. Defaulting to "*"')
 }
 app.use(
   cors({
