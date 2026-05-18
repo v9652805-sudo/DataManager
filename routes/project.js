@@ -42,11 +42,11 @@ router.get("/create", (req, res) => {
 
 router.post("/create", upload.single("projectImg"), async (req, res) => {
   try {
-    const { name, title, description, projectsUrl, projectCodeViewurl } = req.body;
-    if (!name || !title || !description || !projectsUrl || !projectCodeViewurl) {
+    const { name, title, description, projectsUrl, projectCodeViewurl, price } = req.body;
+    if (!name || !title || !description || !projectsUrl || !projectCodeViewurl || !price) {
       return res.status(400).render("edit-project", {
         project: req.body,
-        message: "All fields are required, including Project URL and Code View URL",
+        message: "All fields are required, including Project URL, Code View URL, and Price",
       });
     }
     let projectImg = "";
@@ -60,9 +60,10 @@ router.post("/create", upload.single("projectImg"), async (req, res) => {
       title,
       description,
       projectImg,
-      publicId, // Store publicId for easier deletion
+      publicId,
       projectsUrl,
       projectCodeViewurl,
+      price, // Add price
     });
     await newProject.save();
     res.redirect("/api/projects/view");
@@ -98,7 +99,7 @@ router.get("/edit/:id", async (req, res) => {
 
 router.post("/update/:id", upload.single("projectImg"), async (req, res) => {
   try {
-    const { name, title, description, projectsUrl, projectCodeViewurl } = req.body;
+    const { name, title, description, projectsUrl, projectCodeViewurl, price } = req.body;
     let project = await Project.findById(req.params.id);
     if (!project) {
       const projects = await Project.find();
@@ -108,10 +109,10 @@ router.post("/update/:id", upload.single("projectImg"), async (req, res) => {
         searchQuery: "",
       });
     }
-    if (!name || !title || !description || !projectsUrl || !projectCodeViewurl) {
+    if (!name || !title || !description || !projectsUrl || !projectCodeViewurl || !price) {
       return res.status(400).render("edit-project", {
         project,
-        message: "All fields are required, including Project URL and Code View URL",
+        message: "All fields are required, including Project URL, Code View URL, and Price",
       });
     }
     let projectImg = project.projectImg;
@@ -136,6 +137,7 @@ router.post("/update/:id", upload.single("projectImg"), async (req, res) => {
       publicId,
       projectsUrl,
       projectCodeViewurl,
+      price, // Add price
     });
     res.redirect("/api/projects/view");
   } catch (error) {

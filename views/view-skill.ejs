@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Skills</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -74,7 +76,8 @@
       border-radius: 7px;
       object-fit: cover;
       background: #e9ecef;
-      width: 70px; height: 70px;
+      width: 70px;
+      height: 70px;
       display: block;
       box-shadow: 0 2px 8px rgba(34,34,59,0.09);
     }
@@ -122,35 +125,48 @@
 <body>
   <div class="container">
     <h1>Skills</h1>
+    <% if (message) { %>
+      <p class="message <%= message.includes('Error') ? 'error-message' : 'success-message' %>"><%= message %></p>
+    <% } %>
     <div class="nav-links">
       <a href="/">Home</a> | <a href="/api/skills/create">Add Skill</a> | <a href="/api/skills/json">JSON View</a>
     </div>
     <table>
-      <tr>
-        <th>Skill Name</th>
-        <th>Description</th>
-        <th>Image</th>
-        <th>Actions</th>
-      </tr>
-      <% skills.forEach(function(skill) { %>
+      <thead>
         <tr>
-          <td><%= skill.skillName %></td>
-          <td><%= skill.description %></td>
-          <td>
-            <% if (skill.projectImg) { %>
-              <img src="/<%= skill.projectImg %>" alt="<%= skill.skillName %>"/>
-            <% } else { %>
-              <img src="https://via.placeholder.com/70x70?text=No+Image" alt="No Image"/>
-            <% } %>
-          </td>
-          <td class="action-buttons">
-            <form action="/api/skills/delete/<%= skill._id %>" method="POST" style="display:inline">
-              <button type="submit" class="delete" onclick="return confirm('Delete this skill?')">Delete</button>
-            </form>
-            <a href="/api/skills/edit/<%= skill._id %>" class="edit">Edit</a>
-          </td>
+          <th>Skill Name</th>
+          <th>Description</th>
+          <th>Image</th>
+          <th>Actions</th>
         </tr>
-      <% }); %>
+      </thead>
+      <tbody>
+        <% if (skills.length === 0) { %>
+          <tr>
+            <td colspan="4" style="text-align: center;">No skills found.</td>
+          </tr>
+        <% } else { %>
+          <% skills.forEach(function(skill) { %>
+            <tr>
+              <td><%= skill.skillName %></td>
+              <td><%= skill.description %></td>
+              <td>
+                <% if (skill.projectImg) { %>
+                  <img src="<%= skill.projectImg %>" alt="Image for <%= skill.skillName %>" loading="lazy" onerror="this.src='https://via.placeholder.com/70x70?text=Image+Not+Found'; this.alt='Image not found';"/>
+                <% } else { %>
+                  <img src="https://via.placeholder.com/70x70?text=No+Image" alt="No image for <%= skill.skillName %>" loading="lazy"/>
+                <% } %>
+              </td>
+              <td class="action-buttons">
+                <form action="/api/skills/delete/<%= skill._id %>" method="POST" style="display:inline">
+                  <button type="submit" class="delete" onclick="return confirm('Delete this skill?')">Delete</button>
+                </form>
+                <a href="/api/skills/edit/<%= skill._id %>" class="edit">Edit</a>
+              </td>
+            </tr>
+          <% }); %>
+        <% } %>
+      </tbody>
     </table>
   </div>
 </body>

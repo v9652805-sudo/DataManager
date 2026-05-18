@@ -97,7 +97,6 @@
       color: #22223b;
       border-color: #4f8cff;
     }
-    /* Table Layout for Laptops */
     .project-table {
       width: 100%;
       border-collapse: separate;
@@ -152,7 +151,7 @@
       gap: 8px;
       flex-wrap: nowrap;
       align-items: center;
-      min-width: 140px; /* Ensure space for buttons */
+      min-width: 140px;
     }
     button, a.edit {
       padding: 8px 16px;
@@ -192,7 +191,6 @@
     a.edit:active {
       transform: scale(0.95);
     }
-    /* Card Layout for Android */
     .project-cards {
       display: none;
       flex-direction: column;
@@ -236,7 +234,6 @@
       margin-top: 8px;
       justify-content: flex-start;
     }
-    /* Confirmation Dialog */
     .confirm-dialog {
       position: fixed;
       top: 50%;
@@ -295,7 +292,6 @@
     .overlay.show {
       display: block;
     }
-    /* Media Queries */
     @media (max-width: 768px) {
       .container { padding: 16px; }
       h1 { font-size: 1.5rem; }
@@ -341,8 +337,8 @@
           <th scope="col">Name</th>
           <th scope="col">Title</th>
           <th scope="col">Description</th>
+          <th scope="col">Price</th>
           <th scope="col">Project URL</th>
-         -unsure about this line 
           <th scope="col">Code View URL</th>
           <th scope="col">Image</th>
           <th scope="col">Actions</th>
@@ -351,7 +347,7 @@
       <tbody>
         <% if (projects.length === 0) { %>
           <tr>
-            <td colspan="7" style="text-align: center;">No projects found.</td>
+            <td colspan="8" style="text-align: center;">No projects found.</td>
           </tr>
         <% } else { %>
           <% projects.forEach(function(project) { %>
@@ -359,6 +355,7 @@
               <td title="<%= project.name %>"><%= project.name %></td>
               <td title="<%= project.title %>"><%= project.title %></td>
               <td title="<%= project.description %>"><%= project.description %></td>
+              <td title="₹<%= project.price.toLocaleString() %>">₹<%= project.price.toLocaleString() %></td>
               <td>
                 <a href="<%= project.projectsUrl %>" target="_blank" rel="noopener noreferrer" title="<%= project.projectsUrl %>">
                   <%= project.projectsUrl %>
@@ -371,7 +368,7 @@
               </td>
               <td>
                 <% if (project.projectImg) { %>
-                  <img src="/<%= project.projectImg %>" alt="Project image for <%= project.name %>" loading="lazy" onerror="this.src='https://via.placeholder.com/80x50?text=Image+Not+Found'; this.alt='Image not found';"/>
+                  <img src="<%= project.projectImg %>" alt="Project image for <%= project.name %>" loading="lazy" onerror="this.src='https://via.placeholder.com/80x50?text=Image+Not+Found'; this.alt='Image not found';"/>
                 <% } else { %>
                   <img src="https://via.placeholder.com/80x50?text=No+Image" alt="No image available for <%= project.name %>" loading="lazy"/>
                 <% } %>
@@ -392,10 +389,11 @@
       <% } else { %>
         <% projects.forEach(function(project) { %>
           <div class="project-card">
-            <img src="/<%= project.projectImg || 'via.placeholder.com/300x120?text=No+Image' %>" alt="Project image for <%= project.name %>" loading="lazy" onerror="this.src='https://via.placeholder.com/300x120?text=Image+Not+Found'; this.alt='Image not found';"/>
+            <img src="<%= project.projectImg || 'https://via.placeholder.com/300x120?text=No+Image' %>" alt="Project image for <%= project.name %>" loading="lazy" onerror="this.src='https://via.placeholder.com/300x120?text=Image+Not+Found'; this.alt='Image not found';"/>
             <p><strong>Name:</strong> <%= project.name %></p>
             <p><strong>Title:</strong> <%= project.title %></p>
             <p><strong>Description:</strong> <%= project.description %></p>
+            <p><strong>Price:</strong> ₹<%= project.price.toLocaleString() %></p>
             <p><strong>Project URL:</strong> <a href="<%= project.projectsUrl %>" target="_blank" rel="noopener noreferrer"><%= project.projectsUrl %></a></p>
             <p><strong>Code View URL:</strong> <a href="<%= project.projectCodeViewurl %>" target="_blank" rel="noopener noreferrer"><%= project.projectCodeViewurl %></a></p>
             <div class="action-buttons">
