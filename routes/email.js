@@ -1,40 +1,56 @@
-const express = require('express');
-const router = express.Router();
-const emailjs = require('@emailjs/nodejs');
+const { Router } = require("express");
+const router = Router();
 
-emailjs.init({
-  publicKey: process.env.EMAILJS_PUBLIC_KEY,
-  privateKey: process.env.EMAILJS_PRIVATE_KEY,
-});
-
-router.post('/send-email', async (req, res) => {
-  const { name, email, message } = req.body;
-
-  if (!name || !email || !message) {
-    return res.status(400).json({ error: 'Please fill in all fields.' });
-  }
-
+router.post("/send-email", async (req, res) => {
   try {
-    console.log("📧 Sending email to:", email);
+    const { name, email, message } = req.body;
 
-    const templateParams = { name, email, message };
+    if (!name || !email || !message) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Name, Email and Message are required" 
+      });
+    }
 
-    await emailjs.send(
-      process.env.EMAILJS_SERVICE_ID,
-      process.env.EMAILJS_TEMPLATE_ID,
-      templateParams
-    );
+    const data = {
+      service_id: process.env.EMAILJS_SERVICE_ID,
+      template_id: process.env.EMAILJS_TEMPLATE_ID,
+      user_id: process.env.EMAILJS_PUBLIC_KEY,
+      template_params: {
+        from_name: name,
+        from_email: email,
+        message: message,
+        to_name: "Vishant Velip",
+      }
+    };
 
-    console.log("✅ Email sent successfully");
-    res.status(200).json({ message: 'Email sent successfully!' });
+    const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    const result = await response.text();
+
+    if (response.ok) {
+      console.log("Email sent successfully");
+      return res.json({ 
+        success: true, 
+        message: "Email sent successfully! Thank you." 
+      });
+    } else {
+      console.error("EmailJS Error:", result);
+      return res.status(400).json({ 
+        success: false, 
+        message: "Failed to send email. Please try again later." 
+      });
+    }
 
   } catch (error) {
-    console.error("❌ EmailJS Error:", error);
-    console.error("Error Text:", error.text || error.message);
-    
+    console.error("Send Email Error:", error);
     res.status(500).json({ 
-      error: 'Failed to send email',
-      details: error.text || error.message 
+      success: false, 
+      message: "Server error while sending email" 
     });
   }
 });
