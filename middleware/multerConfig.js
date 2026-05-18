@@ -1,58 +1,40 @@
-const { Router } = require("express");
-const router = Router();
+// middleware/multerConfig.js
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinary = require('cloudinary').v2;
+const multer = require('multer');
 
-router.post("/send-email", async (req, res) => {
-  try {
-    const { name, email, message } = req.body;
-
-    if (!name || !email || !message) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Name, Email and Message are required" 
-      });
-    }
-
-    const data = {
-      service_id: process.env.EMAILJS_SERVICE_ID,
-      template_id: process.env.EMAILJS_TEMPLATE_ID,
-      user_id: process.env.EMAILJS_PUBLIC_KEY,
-      template_params: {
-        from_name: name,
-        from_email: email,
-        message: message,
-        to_name: "Vishant Velip",
-      }
-    };
-
-    const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-
-    const result = await response.text();
-
-    if (response.ok) {
-      console.log("Email sent successfully");
-      return res.json({ 
-        success: true, 
-        message: "Email sent successfully! Thank you." 
-      });
-    } else {
-      console.error("EmailJS Error:", result);
-      return res.status(400).json({ 
-        success: false, 
-        message: "Failed to send email. Please try again later." 
-      });
-    }
-
-  } catch (error) {
-    console.error("Send Email Error:", error);
-    res.status(500).json({ 
-      success: false, 
-      message: "Server error while sending email" 
-    });
-  }
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-module.exports = router;
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'portfolio_uploads',
+    allowed_formats: ['jpg', 'png', 'jpeg', 'gif', 'webp'],
+    transformation: [{ width: 1200, crop: 'limit', quality: 'auto' }],
+    public_id: (req, file) => {
+      const uniqueName = `${Date.now()}-${file.originalname
+        .replace(/\.[^/.]+$/, '')
+        .replace(/[^a-zA-Z0-9_-]/g, '')}`;
+      return uniqueName;
+    },
+  },
+});
+
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  fileFilter: (req, file, cb) => {
+    const allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (allowedMimes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only JPG, PNG, GIF & WebP images are allowed'), false);
+    }
+  },
+});
+
+module.exports = upload;
