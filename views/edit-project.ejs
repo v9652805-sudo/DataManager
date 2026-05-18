@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -34,157 +33,119 @@
       text-align: center;
     }
     .message {
-      color: #e63946;
-      text-align: center;
-      margin-bottom: 18px;
-      font-weight: 500;
-      padding: 10px;
+      padding: 12px;
       border-radius: 8px;
-      background: #ffe6e6;
+      text-align: center;
+      font-weight: 500;
+      margin-bottom: 20px;
     }
-    .success-message {
-      color: #2ecc71;
-      background: #e6ffed;
-    }
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-    .form-group {
-      display: flex;
-      flex-direction: column;
-    }
+    .error { background: #ffe6e6; color: #e63946; }
+    .success { background: #e6ffed; color: #2ecc71; }
+
+    form { display: flex; flex-direction: column; gap: 20px; }
+    .form-group { display: flex; flex-direction: column; }
     label {
-      font-size: 1rem;
       font-weight: 500;
       margin-bottom: 6px;
       color: #4a4e69;
     }
     input[type="text"], input[type="url"], textarea {
-      width: 100%;
       padding: 12px;
       border: 1px solid #e0e4ea;
       border-radius: 8px;
       font-size: 1rem;
-      transition: border-color 0.2s, box-shadow 0.2s;
     }
-    input[type="text"]:focus, input[type="url"]:focus, textarea:focus {
+    input:focus, textarea:focus {
       border-color: #4f8cff;
       box-shadow: 0 0 0 3px #4f8cff22;
       outline: none;
     }
-    input:invalid:not(:placeholder-shown) {
-      border-color: #e63946;
-    }
-    .error-message {
-      color: #e63946;
-      font-size: 0.9rem;
-      margin-top: 4px;
-      display: none;
-    }
-    input:invalid:not(:placeholder-shown) + .error-message {
-      display: block;
-    }
-    textarea {
-      min-height: 100px;
-      resize: vertical;
-    }
-    input[type="file"] {
-      padding: 8px;
-      font-size: 1rem;
-    }
+    textarea { min-height: 100px; resize: vertical; }
+    input[type="file"] { padding: 8px; }
+
     .image-preview {
-      max-width: 150px;
+      max-width: 200px;
       border-radius: 8px;
       margin: 10px 0;
       background: #e0e4ea;
-      object-fit: cover;
     }
+
     .form-buttons {
       display: flex;
       gap: 12px;
       justify-content: center;
       margin-top: 20px;
     }
-    button, a.button {
+    button, .button {
       padding: 12px 24px;
       border: none;
       border-radius: 8px;
       font-size: 1rem;
       font-weight: 600;
       cursor: pointer;
-      text-decoration: none;
-      transition: background 0.2s, transform 0.1s;
     }
     button {
       background: #4f8cff;
-      color: #fff;
+      color: white;
     }
-    button:hover:not(:disabled) {
-      background: #3b82f6;
-      transform: translateY(-2px);
-    }
-    button:disabled {
-      background: #b0b7c3;
-      cursor: not-allowed;
-    }
-    a.button {
+    button:hover:not(:disabled) { background: #3b82f6; }
+    button:disabled { background: #b0b7c3; cursor: not-allowed; }
+    .button {
       background: #6b7280;
-      color: #fff;
-    }
-    a.button:hover {
-      background: #4b5563;
-      transform: translateY(-2px);
-    }
-    @media (max-width: 600px) {
-      .container { padding: 24px; }
-      h2 { font-size: 1.5rem; }
-      input[type="text"], input[type="url"], textarea { font-size: 0.95rem; }
-      button, a.button { padding: 10px 20px; font-size: 0.95rem; }
+      color: white;
+      text-decoration: none;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h2><%= project._id ? 'Edit' : 'Add' %> Project</h2>
+
     <% if (message) { %>
-      <p class="message"><%= message %></p>
+      <p class="message error"><%= message %></p>
     <% } %>
-    <form id="projectForm" action="<%= project._id ? '/api/projects/update/' + project._id : '/api/projects/create' %>" method="POST" enctype="multipart/form-data">
+
+    <form id="projectForm" 
+          action="<%= project._id ? '/api/projects/update/' + project._id : '/api/projects/create' %>" 
+          method="POST" 
+          enctype="multipart/form-data">
+
       <div class="form-group">
         <label for="name">Name:</label>
-        <input type="text" id="name" name="name" value="<%= project.name || '' %>" required placeholder="Enter project name"/>
-        <span class="error-message">Please enter a valid project name.</span>
+        <input type="text" id="name" name="name" value="<%= project.name || '' %>" required>
       </div>
+
       <div class="form-group">
         <label for="title">Title:</label>
-        <input type="text" id="title" name="title" value="<%= project.title || '' %>" required placeholder="Enter project title"/>
-        <span class="error-message">Please enter a valid project title.</span>
+        <input type="text" id="title" name="title" value="<%= project.title || '' %>" required>
       </div>
+
       <div class="form-group">
         <label for="description">Description:</label>
-        <textarea id="description" name="description" required placeholder="Enter project description"><%= project.description || '' %></textarea>
-        <span class="error-message">Please enter a project description.</span>
+        <textarea id="description" name="description" required><%= project.description || '' %></textarea>
       </div>
+
       <div class="form-group">
         <label for="projectsUrl">Project URL:</label>
-        <input type="url" id="projectsUrl" name="projectsUrl" value="<%= project.projectsUrl || '' %>" required placeholder="https://example.com"/>
-        <span class="error-message">Please enter a valid URL (e.g., https://example.com).</span>
+        <input type="url" id="projectsUrl" name="projectsUrl" value="<%= project.projectsUrl || '' %>" required>
       </div>
+
       <div class="form-group">
         <label for="projectCodeViewurl">Code View URL:</label>
-        <input type="url" id="projectCodeViewurl" name="projectCodeViewurl" value="<%= project.projectCodeViewurl || '' %>" required placeholder="https://github.com"/>
-        <span class="error-message">Please enter a valid URL (e.g., https://github.com).</span>
+        <input type="url" id="projectCodeViewurl" name="projectCodeViewurl" value="<%= project.projectCodeViewurl || '' %>" required>
       </div>
+
       <div class="form-group">
-        <label for="projectImg">Image:</label>
-        <input type="file" id="projectImg" name="projectImg" accept="image/jpeg,image/png"/>
+        <label for="projectImg">Project Image:</label>
+        <input type="file" id="projectImg" name="projectImg" accept="image/jpeg,image/png,image/gif,image/webp">
+
         <% if (project.projectImg) { %>
-          <img class="image-preview" src="/<%= project.projectImg %>" alt="Current project image" onerror="this.src='https://via.placeholder.com/150'; this.alt='Image not found';"/>
+          <img class="image-preview" src="<%= project.projectImg %>" alt="Current Image">
         <% } %>
-        <img id="imagePreview" class="image-preview" style="display: none;" alt="Image preview"/>
+
+        <img id="imagePreview" class="image-preview" style="display: none;" alt="Preview">
       </div>
+
       <div class="form-buttons">
         <button type="submit" id="submitBtn">Submit</button>
         <a href="/api/projects/view" class="button">Cancel</a>
@@ -193,54 +154,56 @@
   </div>
 
   <script>
-    // Image preview functionality
-    const projectImgInput = document.getElementById('projectImg');
-    const imagePreview = document.getElementById('imagePreview');
-
-    projectImgInput.addEventListener('change', function () {
-      const file = this.files[0];
+    // Image Preview
+    document.getElementById('projectImg').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      const preview = document.getElementById('imagePreview');
+      
       if (file) {
         const reader = new FileReader();
-        reader.onload = function (e) {
-          imagePreview.src = e.target.result;
-          imagePreview.style.display = 'block';
+        reader.onload = function(ev) {
+          preview.src = ev.target.result;
+          preview.style.display = 'block';
         };
         reader.readAsDataURL(file);
-      } else {
-        imagePreview.style.display = 'none';
       }
     });
 
-    // Form submission with loading state
+    // Form Submit with Fetch
     const form = document.getElementById('projectForm');
     const submitBtn = document.getElementById('submitBtn');
 
-    form.addEventListener('submit', async function (e) {
+    form.addEventListener('submit', async function(e) {
       e.preventDefault();
       submitBtn.disabled = true;
-      submitBtn.textContent = 'Submitting...';
+      submitBtn.textContent = 'Uploading...';
+
+      const formData = new FormData(form);
 
       try {
-        const formData = new FormData(form);
         const response = await fetch(form.action, {
           method: 'POST',
-          body: formData,
+          body: formData
         });
 
         if (response.redirected) {
           window.location.href = response.url;
-        } else {
-          const result = await response.json();
-          const messageDiv = document.createElement('p');
-          messageDiv.className = response.ok ? 'message success-message' : 'message';
-          messageDiv.textContent = result.message || 'An error occurred';
-          form.parentNode.insertBefore(messageDiv, form);
+          return;
         }
-      } catch (error) {
-        const messageDiv = document.createElement('p');
-        messageDiv.className = 'message';
-        messageDiv.textContent = 'Failed to submit the form. Please try again.';
-        form.parentNode.insertBefore(messageDiv, form);
+
+        const result = await response.json().catch(() => ({}));
+
+        // Show error message
+        let msgDiv = document.querySelector('.message');
+        if (!msgDiv) {
+          msgDiv = document.createElement('p');
+          msgDiv.className = 'message error';
+          form.parentNode.insertBefore(msgDiv, form);
+        }
+        msgDiv.textContent = result.message || 'Something went wrong!';
+      } catch (err) {
+        console.error(err);
+        alert('Network error. Please check your connection.');
       } finally {
         submitBtn.disabled = false;
         submitBtn.textContent = 'Submit';
