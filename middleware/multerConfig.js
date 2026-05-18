@@ -8,29 +8,32 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const imageStorage = new CloudinaryStorage({
+const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  params: async (req, file) => {
-    return {
-      folder: 'portfolio_uploads', // Updated folder name for clarity
-      allowed_formats: ['jpg', 'png', 'jpeg', 'gif'],
-      public_id: `${Date.now()}-${file.originalname.replace(/\.[^/.]+$/, '')}`, // Remove file extension
-      overwrite: true, // Overwrite files with the same public_id
-    };
+  params: {
+    folder: 'portfolio_uploads',
+    allowed_formats: ['jpg', 'png', 'jpeg', 'gif', 'webp'],
+    transformation: [{ width: 1200, crop: 'limit', quality: 'auto' }], // Optional: optimize
+    public_id: (req, file) => {
+      const uniqueName = `${Date.now()}-${file.originalname
+        .replace(/\.[^/.]+$/, '')
+        .replace(/[^a-zA-Z0-9_-]/g, '')}`;
+      return uniqueName;
+    },
   },
 });
 
-const cloudinaryUpload = multer({
-  storage: imageStorage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
   fileFilter: (req, file, cb) => {
-    const allowedMimes = ['image/jpeg', 'image/png', 'image/gif'];
+    const allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
     if (allowedMimes.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error('Invalid file type. Only JPG, PNG, and GIF are allowed.'), false);
+      cb(new Error('Only JPG, PNG, GIF & WebP images are allowed'), false);
     }
   },
 });
 
-module.exports = cloudinaryUpload;
+module.exports = upload;
