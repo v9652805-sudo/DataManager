@@ -3,8 +3,8 @@ const router = express.Router();
 const emailjs = require('@emailjs/nodejs');
 
 emailjs.init({
-  publicKey: 'JCxc_yKuAex9-h3QS', 
-  privateKey: 'W_zMXHKXKvHjG9dwi63i-',
+  publicKey: 'lUYicfMscMJKE1eKj', 
+  privateKey: 'xn7rq4KVbFcFcGqWWKuMC',
 });
 
 router.post('/send-email', async (req, res) => {
