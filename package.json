@@ -14,17 +14,16 @@
   "license": "ISC",
   "dependencies": {
     "@emailjs/nodejs": "^5.0.2",
+    "apollo-server-express": "^3.12.0",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "ejs": "^3.1.10",
     "express": "^5.1.0",
-    "express-graphql": "^0.12.0",
-    "graphql": "^16.8.1",
+    "graphql": "^15.8.0",
     "mongoose": "^8.15.2",
     "multer": "^2.0.1",
     "cloudinary": "^1.30.0",
-    "multer-storage-cloudinary": "^4.0.0",
-    "node-fetch": "^2.7.0"
+    "multer-storage-cloudinary": "^4.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.2"
