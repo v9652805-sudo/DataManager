@@ -11,6 +11,7 @@ const {
 const Project = require("../models/project");
 const Skill = require("../models/Skills");
 const About = require("../models/about");
+const cloudinary = require("cloudinary").v2;
 
 // ====================== TYPES ======================
 const ProjectType = new GraphQLObjectType({
@@ -199,6 +200,14 @@ const Mutation = new GraphQLObjectType({
       args: { id: { type: new GraphQLNonNull(GraphQLID) } },
       resolve: async (parent, args) => {
         try {
+          const project = await Project.findById(args.id);
+          if (project?.publicId) {
+            try {
+              await cloudinary.uploader.destroy(project.publicId);
+            } catch (err) {
+              console.error("Cloudinary delete error:", err);
+            }
+          }
           await Project.findByIdAndDelete(args.id);
           return "Project deleted successfully";
         } catch (error) {
@@ -239,6 +248,14 @@ const Mutation = new GraphQLObjectType({
       args: { id: { type: new GraphQLNonNull(GraphQLID) } },
       resolve: async (parent, args) => {
         try {
+          const skill = await Skill.findById(args.id);
+          if (skill?.publicId) {
+            try {
+              await cloudinary.uploader.destroy(`portfolio_uploads/${skill.publicId}`);
+            } catch (err) {
+              console.error("Cloudinary delete error:", err);
+            }
+          }
           await Skill.findByIdAndDelete(args.id);
           return "Skill deleted successfully";
         } catch (error) {
