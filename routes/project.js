@@ -24,6 +24,25 @@ router.get("/view", async (req, res) => {
   }
 });
 
+// ✅ ADD THIS ROUTE (JSON View)
+router.get("/json", async (req, res) => {
+  try {
+    const projects = await Project.find().sort({ createdAt: -1 });
+    res.json({
+      success: true,
+      count: projects.length,
+      projects: projects
+    });
+  } catch (error) {
+    console.error("JSON Error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching projects",
+      error: error.message
+    });
+  }
+});
+
 router.get("/create", (req, res) => {
   res.render("edit-project", { project: {}, message: null });
 });
@@ -89,7 +108,6 @@ router.post("/update/:id", upload.single("projectImg"), async (req, res) => {
     let projectImg = project.projectImg;
     let publicId = project.publicId;
 
-    // Delete old image if new one is uploaded
     if (req.file) {
       if (publicId) {
         try {
