@@ -34,6 +34,7 @@ app.use("/api/about", aboutRoutes);
 app.use("/api/skills", skillRoutes);
 app.use("/api/database", databaseRoutes);
 app.use("/api/email", emailRoutes);
+app.use("/api/chat", chatRoutes);
 
 // Pages
 app.get("/", (req, res) => res.render("home"));
