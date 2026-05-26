@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quotation Chatbot</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f5f5f5;
+    }
+
+    .chatbot-widget {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 380px;
+      height: 500px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 5px 40px rgba(0, 0, 0, 0.16);
+      display: flex;
+      flex-direction: column;
+      z-index: 9999;
+      overflow: hidden;
+      animation: slideUp 0.3s ease-out;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .chatbot-header {
+      background: linear-gradient(135deg, #4f8cff 0%, #3b82f6 100%);
+      color: white;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .chatbot-header h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .close-btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .close-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .chatbot-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: #fafafa;
+    }
+
+    .message {
+      display: flex;
+      gap: 8px;
+      animation: fadeIn 0.3s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .message.bot {
+      justify-content: flex-start;
+    }
+
+    .message.user {
+      justify-content: flex-end;
+    }
+
+    .message-content {
+      max-width: 70%;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      word-wrap: break-word;
+    }
+
+    .message.bot .message-content {
+      background: #e3f2fd;
+      color: #1976d2;
+      border-radius: 10px 10px 10px 2px;
+    }
+
+    .message.user .message-content {
+      background: #4f8cff;
+      color: white;
+      border-radius: 10px 10px 2px 10px;
+    }
+
+    .chatbot-input-area {
+      padding: 12px;
+      border-top: 1px solid #e0e0e0;
+      background: white;
+    }
+
+    .input-form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .form-step {
+      display: none;
+    }
+
+    .form-step.active {
+      display: block;
+      animation: fadeIn 0.3s ease-in;
+    }
+
+    .form-step label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #333;
+      margin-bottom: 4px;
+      display: block;
+    }
+
+    .form-step input,
+    .form-step textarea {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+      transition: border-color 0.2s;
+    }
+
+    .form-step input:focus,
+    .form-step textarea:focus {
+      outline: none;
+      border-color: #4f8cff;
+      box-shadow: 0 0 0 2px rgba(79, 140, 255, 0.1);
+    }
+
+    .button-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    button {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: #4f8cff;
+      color: white;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: #3b82f6;
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: #f0f0f0;
+      color: #333;
+    }
+
+    .btn-secondary:hover {
+      background: #e0e0e0;
+    }
+
+    .success-message {
+      background: #e8f5e9;
+      color: #2e7d32;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    .error-message {
+      background: #ffebee;
+      color: #c62828;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    .loading {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #4f8cff;
+      animation: loading 1.4s infinite;
+    }
+
+    .loading:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .loading:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes loading {
+      0%, 80%, 100% {
+        opacity: 0.3;
+      }
+      40% {
+        opacity: 1;
+      }
+    }
+
+    .loader-container {
+      display: flex;
+      gap: 4px;
+      padding: 10px 14px;
+    }
+
+    @media (max-width: 480px) {
+      .chatbot-widget {
+        width: calc(100% - 20px);
+        height: calc(100vh - 40px);
+        max-height: 600px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="chatbot-widget" id="chatbotWidget">
+    <div class="chatbot-header">
+      <h3>Get a Quotation</h3>
+      <button class="close-btn" id="closeBtn">&times;</button>
+    </div>
+
+    <div class="chatbot-messages" id="chatMessages"></div>
+
+    <div class="chatbot-input-area">
+      <form class="input-form" id="quotationForm">
+        <!-- Step 1: Name -->
+        <div class="form-step active" id="step1">
+          <label for="userName">What's your name?</label>
+          <input type="text" id="userName" placeholder="Enter your full name" required>
+          <button type="button" class="btn-primary" onclick="nextStep(1)">Next</button>
+        </div>
+
+        <!-- Step 2: Email -->
+        <div class="form-step" id="step2">
+          <label for="userEmail">Your email address</label>
+          <input type="email" id="userEmail" placeholder="you@example.com" required>
+          <div class="button-group">
+            <button type="button" class="btn-secondary" onclick="prevStep(2)">Back</button>
+            <button type="button" class="btn-primary" onclick="nextStep(2)">Next</button>
+          </div>
+        </div>
+
+        <!-- Step 3: Budget -->
+        <div class="form-step" id="step3">
+          <label for="userBudget">Estimated budget (₹)</label>
+          <input type="number" id="userBudget" placeholder="e.g., 50000" min="0">
+          <div class="button-group">
+            <button type="button" class="btn-secondary" onclick="prevStep(3)">Back</button>
+            <button type="button" class="btn-primary" onclick="nextStep(3)">Next</button>
+          </div>
+        </div>
+
+        <!-- Step 4: Project Details -->
+        <div class="form-step" id="step4">
+          <label for="projectDetails">Tell us about your project</label>
+          <textarea id="projectDetails" placeholder="Describe your project, features, timeline, etc." rows="3" required></textarea>
+          <div class="button-group">
+            <button type="button" class="btn-secondary" onclick="prevStep(4)">Back</button>
+            <button type="submit" class="btn-primary" id="submitBtn">Submit</button>
+          </div>
+        </div>
+      </form>
+
+      <div id="successMessage" style="display: none;">
+        <div class="success-message">
+          <strong>✓ Request Submitted!</strong><br>
+          We'll review your project and send you a quotation soon.<br>
+          <small>Quotation ID: <span id="quotationId"></span></small>
+        </div>
+        <button class="btn-primary" style="width: 100%; margin-top: 10px;" onclick="resetChat()">Start New Request</button>
+      </div>
+
+      <div id="errorMessage" style="display: none;">
+        <div class="error-message" id="errorText"></div>
+        <button class="btn-secondary" style="width: 100%; margin-top: 10px;" onclick="resetChat()">Try Again</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const chatMessages = document.getElementById('chatMessages');
+    const form = document.getElementById('quotationForm');
+    const closeBtn = document.getElementById('closeBtn');
+    let currentStep = 1;
+
+    // Initialize chatbot
+    function init() {
+      addBotMessage("Hello! 👋 I'm here to help you get a quotation for your project. Let's get started!");
+    }
+
+    function addBotMessage(text) {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'message bot';
+      msgDiv.innerHTML = `<div class="message-content">${text}</div>`;
+      chatMessages.appendChild(msgDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function addUserMessage(text) {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'message user';
+      msgDiv.innerHTML = `<div class="message-content">${text}</div>`;
+      chatMessages.appendChild(msgDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function showLoadingMessage() {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'message bot';
+      msgDiv.innerHTML = `<div class="loader-container"><div class="loading"></div><div class="loading"></div><div class="loading"></div></div>`;
+      chatMessages.appendChild(msgDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      return msgDiv;
+    }
+
+    function nextStep(step) {
+      // Validate current step
+      if (step === 1) {
+        const name = document.getElementById('userName').value.trim();
+        if (!name) {
+          alert('Please enter your name');
+          return;
+        }
+        addUserMessage(name);
+        addBotMessage('Nice to meet you, ' + name + '! 😊');
+      } else if (step === 2) {
+        const email = document.getElementById('userEmail').value.trim();
+        if (!email || !email.includes('@')) {
+          alert('Please enter a valid email');
+          return;
+        }
+        addUserMessage(email);
+        addBotMessage('Got it! 📧');
+      } else if (step === 3) {
+        const budget = document.getElementById('userBudget').value;
+        const budgetText = budget ? '₹' + parseInt(budget).toLocaleString('en-IN') : 'Not specified';
+        addUserMessage(budgetText);
+        addBotMessage('Budget noted! 💰');
+      }
+
+      // Hide current step and show next
+      document.getElementById('step' + step).classList.remove('active');
+      currentStep = step + 1;
+      document.getElementById('step' + currentStep).classList.add('active');
+    }
+
+    function prevStep(step) {
+      document.getElementById('step' + step).classList.remove('active');
+      currentStep = step - 1;
+      document.getElementById('step' + currentStep).classList.add('active');
+    }
+
+    function resetChat() {
+      currentStep = 1;
+      document.getElementById('quotationForm').reset();
+      document.getElementById('successMessage').style.display = 'none';
+      document.getElementById('errorMessage').style.display = 'none';
+      document.getElementById('step4').classList.remove('active');
+      document.getElementById('step1').classList.add('active');
+      chatMessages.innerHTML = '';
+      init();
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById('userName').value.trim();
+      const email = document.getElementById('userEmail').value.trim();
+      const budget = parseFloat(document.getElementById('userBudget').value) || 0;
+      const projectDetails = document.getElementById('projectDetails').value.trim();
+
+      if (!projectDetails) {
+        alert('Please describe your project');
+        return;
+      }
+
+      addUserMessage(projectDetails);
+      addBotMessage('Processing your request...');
+
+      const loadingMsg = showLoadingMessage();
+
+      try {
+        const response = await fetch('https://data-manager-two.vercel.app/api/quotations/submit', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name,
+            email,
+            projectDetails,
+            estimatedBudget: budget,
+          }),
+        });
+
+        loadingMsg.remove();
+
+        if (response.ok) {
+          const data = await response.json();
+          addBotMessage('✅ Your quotation request has been submitted! We\'ll review your project and send you a quotation to ' + email + ' within 24-48 hours.');
+
+          document.getElementById('quotationForm').style.display = 'none';
+          document.getElementById('successMessage').style.display = 'block';
+          document.getElementById('quotationId').textContent = data.quotationId;
+        } else {
+          throw new Error('Failed to submit quotation');
+        }
+      } catch (error) {
+        loadingMsg.remove();
+        addBotMessage('❌ Sorry, something went wrong. Please try again later.');
+        document.getElementById('quotationForm').style.display = 'none';
+        document.getElementById('errorMessage').style.display = 'block';
+        document.getElementById('errorText').textContent = error.message;
+      }
+    });
+
+    closeBtn.addEventListener('click', () => {
+      document.getElementById('chatbotWidget').style.display = 'none';
+    });
+
+    // Initialize on load
+    init();
+  </script>
+</body>
+</html>
