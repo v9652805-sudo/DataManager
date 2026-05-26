@@ -10,7 +10,7 @@ const emailRoutes = require("./routes/email");
 const projectRoutes = require("./routes/project");
 const aboutRoutes = require("./routes/about");
 const skillRoutes = require("./routes/skill");
-const databaseRoutes = require("./routes/database");
+const databaseRoutes = required("../models/Database");
 const botRoutes = require("./routes/bot");
 
 const port = process.env.PORT || 8000;
