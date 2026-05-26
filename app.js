@@ -5,6 +5,7 @@ const emailRoutes = require("./routes/email");
 const projectRoutes = require("./routes/project");
 const aboutRoutes = require("./routes/about");
 const skillRoutes = require("./routes/skill");
+const chatRoutes = require("./routes/chat");
 const cors = require("cors");
 require("dotenv").config();
 
@@ -40,6 +41,7 @@ app.use("/api/projects", projectRoutes);
 app.use("/api/about", aboutRoutes);
 app.use("/api/skills", skillRoutes);
 app.use("/api/email", emailRoutes);
+app.use("/api/chat", chatRoutes);
 
 app.get("/", (req, res) => {
   res.render("home", { message: null });
