@@ -1,31 +1,63 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Portfolio Home</title>
+  <title>Portfolio Dashboard</title>
   <style>
-    /* (Keep your existing styles - I'm only showing the important part) */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #22223b, #4a4e69);
+      min-height: 100vh;
+      color: #fff;
+      padding: 40px 20px;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: rgba(35, 41, 70, 0.95);
+      border-radius: 20px;
+      padding: 40px 30px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+    h1 {
+      text-align: center;
+      color: #ffe066;
+      margin-bottom: 40px;
+      font-size: 2.8rem;
+    }
     .dashboard {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 25px;
-      margin-top: 30px;
     }
     .card {
       background: #232946;
-      border-radius: 15px;
-      padding: 25px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      border-radius: 16px;
+      padding: 28px;
+      transition: all 0.3s;
     }
-    .card h3 { color: #ffe066; margin-bottom: 15px; }
+    .card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 15px 30px rgba(79, 140, 255, 0.3);
+    }
+    .card h3 {
+      color: #4f8cff;
+      margin-bottom: 20px;
+      font-size: 1.4rem;
+    }
     .card-links a {
       display: block;
-      padding: 10px;
       background: #4f8cff;
       color: white;
+      padding: 12px 15px;
+      margin: 10px 0;
+      border-radius: 10px;
       text-decoration: none;
-      margin: 8px 0;
-      border-radius: 8px;
       text-align: center;
+      font-weight: 600;
+    }
+    .card-links a:hover {
+      background: #3b7dd4;
     }
   </style>
 </head>
@@ -34,43 +66,47 @@
     <h1>Portfolio Dashboard</h1>
 
     <div class="dashboard">
-      <!-- Existing Cards -->
+
+      <!-- Projects -->
       <div class="card">
         <h3>Projects</h3>
         <div class="card-links">
           <a href="/api/projects/view">View Projects</a>
-          <a href="/api/projects/json">JSON</a>
+          <a href="/api/projects/json">View JSON</a>
           <a href="/api/projects/create">Add Project</a>
         </div>
       </div>
 
+      <!-- Skills -->
       <div class="card">
         <h3>Skills</h3>
         <div class="card-links">
           <a href="/api/skills/view">View Skills</a>
-          <a href="/api/skills/json">JSON</a>
+          <a href="/api/skills/json">View JSON</a>
           <a href="/api/skills/create">Add Skill</a>
         </div>
       </div>
 
+      <!-- About -->
       <div class="card">
         <h3>About</h3>
         <div class="card-links">
           <a href="/api/about/view">View About</a>
-          <a href="/api/about/json">JSON</a>
+          <a href="/api/about/json">View JSON</a>
           <a href="/api/about/create">Add About</a>
         </div>
       </div>
 
-      <!-- New Database Card -->
+      <!-- Extra Database - NEW -->
       <div class="card">
         <h3>Extra Database</h3>
         <div class="card-links">
           <a href="/api/database/view">View All Entries</a>
           <a href="/api/database/create">Add New Entry</a>
-          <a href="/api/database/json">JSON View</a>
+          <a href="/api/database/json">View JSON</a>
         </div>
       </div>
+
     </div>
   </div>
 </body>
