@@ -1,7 +1,7 @@
 // routes/chat.js
 const { Router } = require("express");
 const Project = require("../models/project");
-const Skill = require("../models/Skill");
+const Skill = require("../models/Skills);
 const About = require("../models/about");
 const Database = require("../models/Database");
 
