@@ -3,157 +3,72 @@
 <head>
   <title>Portfolio Home</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #22223b, #4a4e69 65%);
-      min-height: 100vh;
-      color: #fff;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      padding: 40px 0;
-      overflow-x: hidden;
-    }
-    .container {
-      max-width: 900px;
-      width: 97%;
-      text-align: center;
-      background: rgba(27, 28, 54, 0.88);
-      border-radius: 18px;
-      box-shadow: 0 6px 36px rgba(34,34,59,0.14);
-      padding: 36px 22px;
-      margin: 0 auto;
-    }
-    h1 {
-      font-size: 2.7rem;
-      font-weight: 800;
-      color: #ffe066;
-      margin-bottom: 34px;
-      text-transform: uppercase;
-      letter-spacing: 3px;
-      position: relative;
-      animation: fadeIn 1s ease-in-out;
-    }
-    h1::after {
-      content: '';
-      width: 65px;
-      height: 4px;
-      background: #4f8cff;
-      position: absolute;
-      bottom: -13px;
-      left: 50%;
-      transform: translateX(-50%);
-      border-radius: 2px;
-    }
-    .message {
-      color: #e63946;
-      margin-bottom: 24px;
-      font-weight: 500;
-      font-size: 1.1rem;
-      background: rgba(248, 113, 113, 0.13);
-      padding: 13px;
-      border-radius: 9px;
-      animation: slideIn 0.5s ease-in-out;
-    }
+    /* (Keep your existing styles - I'm only showing the important part) */
     .dashboard {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 30px;
-      margin-top: 35px;
+      gap: 25px;
+      margin-top: 30px;
     }
     .card {
       background: #232946;
       border-radius: 15px;
-      padding: 30px 18px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.13);
-      transition: transform 0.3s, box-shadow 0.3s;
-      border: 2px solid #4f8cff44;
-      animation: cardFadeIn 0.8s;
+      padding: 25px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
     }
-    .card:hover {
-      transform: translateY(-12px);
-      box-shadow: 0 12px 36px #4f8cff55;
-      background: #4a4e69;
-    }
-    .card h3 {
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: #ffe066;
-      margin-bottom: 19px;
-    }
-    .card-links {
-      display: flex;
-      flex-direction: column;
-      gap: 13px;
-    }
+    .card h3 { color: #ffe066; margin-bottom: 15px; }
     .card-links a {
-      color: #4f8cff;
-      background: #fff;
-      padding: 8px 0;
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 1rem;
-      border-radius: 7px;
-      transition: background 0.2s, color 0.2s, transform 0.16s;
-    }
-    .card-links a:hover {
+      display: block;
+      padding: 10px;
       background: #4f8cff;
-      color: #fff;
-      transform: scale(1.08);
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateX(-20px); }
-      to { opacity: 1; transform: translateX(0); }
-    }
-    @keyframes cardFadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @media (max-width: 700px) {
-      h1 { font-size: 1.5rem; }
-      .container { padding: 16px; }
-      .card { padding: 16px; }
-      .dashboard { gap: 13px; }
-    }
-    @media (max-width: 480px) {
-      .dashboard { grid-template-columns: 1fr; }
+      color: white;
+      text-decoration: none;
+      margin: 8px 0;
+      border-radius: 8px;
+      text-align: center;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Portfolio Dashboard</h1>
-    <% if (message) { %>
-      <p class="message"><%= message %></p>
-    <% } %>
+
     <div class="dashboard">
+      <!-- Existing Cards -->
       <div class="card">
         <h3>Projects</h3>
         <div class="card-links">
           <a href="/api/projects/view">View Projects</a>
-          <a href="/api/projects/json">View Projects (JSON)</a>
+          <a href="/api/projects/json">JSON</a>
           <a href="/api/projects/create">Add Project</a>
         </div>
       </div>
+
       <div class="card">
         <h3>Skills</h3>
         <div class="card-links">
           <a href="/api/skills/view">View Skills</a>
-          <a href="/api/skills/json">View Skills (JSON)</a>
+          <a href="/api/skills/json">JSON</a>
           <a href="/api/skills/create">Add Skill</a>
         </div>
       </div>
+
       <div class="card">
         <h3>About</h3>
         <div class="card-links">
           <a href="/api/about/view">View About</a>
-          <a href="/api/about/json">View About (JSON)</a>
+          <a href="/api/about/json">JSON</a>
           <a href="/api/about/create">Add About</a>
+        </div>
+      </div>
+
+      <!-- New Database Card -->
+      <div class="card">
+        <h3>Extra Database</h3>
+        <div class="card-links">
+          <a href="/api/database/view">View All Entries</a>
+          <a href="/api/database/create">Add New Entry</a>
+          <a href="/api/database/json">JSON View</a>
         </div>
       </div>
     </div>
