@@ -1,23 +1,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title><%= isEdit ? 'Edit' : 'Add' %> Database Entry</title>
+  <title><%= isEdit ? 'Edit' : 'Add' %> Entry</title>
   <style>
-    body { font-family: 'Inter', sans-serif; background: #22223b; color: #fff; padding: 30px; }
-    .form-container { max-width: 700px; margin: 0 auto; background: #2a2d4a; padding: 30px; border-radius: 15px; }
-    input, textarea, select { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: none; }
-    button { padding: 12px 25px; background: #4f8cff; color: white; border: none; border-radius: 8px; cursor: pointer; }
+    body { font-family: Arial, sans-serif; background: #22223b; color: #fff; padding: 30px; }
+    .container { max-width: 700px; margin: auto; background: #2a2d4a; padding: 30px; border-radius: 15px; }
+    input, select, textarea { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; }
+    button { padding: 12px 30px; background: #4f8cff; color: white; border: none; border-radius: 8px; cursor: pointer; }
+    .error { color: #ff6b6b; background: #4a2a2a; padding: 10px; border-radius: 8px; }
   </style>
 </head>
 <body>
-  <div class="form-container">
+  <div class="container">
     <h1><%= isEdit ? 'Edit' : 'Add New' %> Information</h1>
-    <% if (message) { %><p style="color:red"><%= message %></p><% } %>
+    
+    <% if (message) { %>
+      <p class="error"><%= message %></p>
+    <% } %>
 
     <form action="<%= isEdit ? '/api/database/update/' + item._id : '/api/database/create' %>" 
           method="POST" enctype="multipart/form-data">
-
-      <input type="text" name="title" placeholder="Title (e.g. My Education)" value="<%= item.title || '' %>" required>
+      
+      <input type="text" name="title" placeholder="Title" value="<%= item.title || '' %>" required>
       
       <select name="category">
         <option value="about" <%= item.category === 'about' ? 'selected' : '' %>>About</option>
@@ -28,16 +32,14 @@
         <option value="other" <%= item.category === 'other' ? 'selected' : '' %>>Other</option>
       </select>
 
-      <textarea name="description" rows="6" placeholder="Description / Content" required><%= item.description || '' %></textarea>
+      <textarea name="description" rows="6" placeholder="Description" required><%= item.description || '' %></textarea>
       
       <input type="file" name="image" accept="image/*">
-      
       <input type="text" name="link" placeholder="Link (optional)" value="<%= item.link || '' %>">
-      <input type="text" name="linkText" placeholder="Link Text (e.g. View Certificate)" value="<%= item.linkText || '' %>">
-      
+      <input type="text" name="linkText" placeholder="Link Text" value="<%= item.linkText || '' %>">
       <input type="number" name="order" placeholder="Display Order" value="<%= item.order || 0 %>">
 
-      <button type="submit"><%= isEdit ? 'Update' : 'Add to Database' %></button>
+      <button type="submit"><%= isEdit ? 'Update Entry' : 'Create Entry' %></button>
     </form>
   </div>
 </body>
