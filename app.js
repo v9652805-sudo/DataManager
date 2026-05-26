@@ -8,7 +8,7 @@ const emailRoutes = require("./routes/email");
 const projectRoutes = require("./routes/project");
 const aboutRoutes = require("./routes/about");
 const skillRoutes = require("./routes/skill");
-const databaseRoutes = require("./routes/database");
+const databaseRoutes = require("./routes/Database");
 
 const app = express();
 const port = process.env.PORT || 8000;
