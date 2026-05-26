@@ -5,13 +5,12 @@ const upload = require("../middleware/multerConfig");
 
 const router = Router();
 
-// View
 router.get("/view", async (req, res) => {
   try {
     const items = await Database.find().sort({ order: 1, createdAt: -1 });
     res.render("viewDatabase", { items });
   } catch (e) {
-    res.status(500).render("viewDatabase", { items: [], message: "Error loading" });
+    res.status(500).render("viewDatabase", { items: [] });
   }
 });
 
@@ -20,21 +19,24 @@ router.get("/json", async (req, res) => {
   res.json(items);
 });
 
-// Forms
 router.get("/create", (req, res) => res.render("editDatabase", { item: {}, isEdit: false }));
+
 router.get("/edit/:id", async (req, res) => {
   const item = await Database.findById(req.params.id);
-  res.render("editDatabase", { item, isEdit: true });
+  res.render("editDatabase", { item: item || {}, isEdit: true });
 });
 
-// Create & Update
 router.post("/create", upload.single("image"), async (req, res) => {
   const { title, category, description, link, linkText, order } = req.body;
   await Database.create({
-    title, category, description, link, linkText,
+    title,
+    category: category || "other",
+    description,
+    link: link || "",
+    linkText: linkText || "",
     order: Number(order) || 0,
-    image: req.file?.path || "",
-    publicId: req.file?.public_id || ""
+    image: req.file ? req.file.path : "",
+    publicId: req.file ? req.file.public_id : ""
   });
   res.redirect("/api/database/view");
 });
@@ -42,7 +44,7 @@ router.post("/create", upload.single("image"), async (req, res) => {
 router.post("/update/:id", upload.single("image"), async (req, res) => {
   const { title, category, description, link, linkText, order } = req.body;
   const item = await Database.findById(req.params.id);
-
+  
   let image = item.image;
   let publicId = item.publicId;
 
