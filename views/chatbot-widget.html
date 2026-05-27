@@ -270,6 +270,60 @@
       padding: 10px 14px;
     }
 
+    .query-input-area {
+      display: flex;
+      gap: 8px;
+    }
+
+    .query-input-area input {
+      flex: 1;
+      padding: 8px 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+
+    .query-input-area input:focus {
+      outline: none;
+      border-color: #4f8cff;
+    }
+
+    .query-input-area button {
+      padding: 8px 12px;
+      background: #4f8cff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .query-input-area button:hover {
+      background: #3b82f6;
+    }
+
+    .quick-reply-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .quick-reply-btn {
+      background: #f0f0f0;
+      color: #333;
+      border: 1px solid #ddd;
+      padding: 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+
+    .quick-reply-btn:hover {
+      background: #e0e0e0;
+      border-color: #4f8cff;
+    }
+
     @media (max-width: 480px) {
       .chatbot-widget {
         width: calc(100% - 20px);
@@ -282,14 +336,24 @@
 <body>
   <div class="chatbot-widget" id="chatbotWidget">
     <div class="chatbot-header">
-      <h3>Get a Quotation</h3>
+      <h3>Chat with Us</h3>
       <button class="close-btn" id="closeBtn">&times;</button>
     </div>
 
     <div class="chatbot-messages" id="chatMessages"></div>
 
     <div class="chatbot-input-area">
-      <form class="input-form" id="quotationForm">
+      <!-- Query Input Mode (default) -->
+      <div id="queryMode" class="input-form">
+        <div class="query-input-area">
+          <input type="text" id="userQuery" placeholder="Ask about projects, quotation..." autocomplete="off">
+          <button type="button" onclick="sendQuery()">Send</button>
+        </div>
+        <div class="quick-reply-buttons" id="quickReplies"></div>
+      </div>
+
+      <!-- Quotation Form Mode -->
+      <form class="input-form" id="quotationForm" style="display: none;">
         <!-- Step 1: Name -->
         <div class="form-step active" id="step1">
           <label for="userName">What's your name?</label>
@@ -347,12 +411,30 @@
   <script>
     const chatMessages = document.getElementById('chatMessages');
     const form = document.getElementById('quotationForm');
+    const queryMode = document.getElementById('queryMode');
     const closeBtn = document.getElementById('closeBtn');
+    const userQueryInput = document.getElementById('userQuery');
     let currentStep = 1;
+
+    // API Base URL
+    const API_BASE = 'https://data-manager-two.vercel.app/api';
 
     // Initialize chatbot
     function init() {
-      addBotMessage("Hello! 👋 I'm here to help you get a quotation for your project. Let's get started!");
+      addBotMessage("👋 Hello! I'm here to help. You can:");
+      addBotMessage("• Ask about our projects");
+      addBotMessage("• Request a quotation");
+      addBotMessage("• Ask any other questions");
+      displayQuickReplies();
+    }
+
+    function displayQuickReplies() {
+      const quickRepliesContainer = document.getElementById('quickReplies');
+      quickRepliesContainer.innerHTML = `
+        <button type="button" class="quick-reply-btn" onclick="quickReply('Show me your projects')">📁 View Projects</button>
+        <button type="button" class="quick-reply-btn" onclick="quickReply('I want a quotation')">💼 Get Quotation</button>
+        <button type="button" class="quick-reply-btn" onclick="quickReply('What are your skills')">⚙️ Your Skills</button>
+      `;
     }
 
     function addBotMessage(text) {
@@ -378,6 +460,75 @@
       chatMessages.appendChild(msgDiv);
       chatMessages.scrollTop = chatMessages.scrollHeight;
       return msgDiv;
+    }
+
+    // Check if query is about quotation
+    function isQuotationQuery(text) {
+      const quotationKeywords = ['quotation', 'quote', 'price', 'cost', 'budget', 'project cost', 'how much', 'estimate', 'bid', 'proposal'];
+      return quotationKeywords.some(keyword => text.toLowerCase().includes(keyword));
+    }
+
+    async function sendQuery() {
+      const query = userQueryInput.value.trim();
+      if (!query) return;
+
+      addUserMessage(query);
+      userQueryInput.value = '';
+
+      // Check if it's a quotation request
+      if (isQuotationQuery(query)) {
+        addBotMessage("Got it! You'd like a quotation. Let me collect some details from you. 📝");
+        switchToQuotationForm();
+        return;
+      }
+
+      // Handle general queries
+      const loadingMsg = showLoadingMessage();
+
+      try {
+        const response = await fetch(`${API_BASE}/chat/message`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            message: query,
+            type: 'general' // Indicate it's a general query, not a quotation
+          }),
+        });
+
+        loadingMsg.remove();
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.reply) {
+            addBotMessage(data.reply);
+          }
+          if (data.projects && data.projects.length > 0) {
+            addBotMessage('📂 Here are our projects:');
+            data.projects.forEach(project => {
+              addBotMessage(`<strong>${project.name}</strong> - ${project.title}\n💰 Price: ₹${project.price}`);
+            });
+          }
+        } else {
+          addBotMessage('❌ Sorry, I couldn\'t process that. Could you rephrase your question?');
+        }
+      } catch (error) {
+        loadingMsg.remove();
+        addBotMessage('❌ Connection error. Please try again.');
+      }
+    }
+
+    function quickReply(text) {
+      userQueryInput.value = text;
+      sendQuery();
+    }
+
+    function switchToQuotationForm() {
+      queryMode.style.display = 'none';
+      form.style.display = 'block';
+      document.getElementById('step1').classList.add('active');
+      currentStep = 1;
     }
 
     function nextStep(step) {
@@ -424,6 +575,8 @@
       document.getElementById('errorMessage').style.display = 'none';
       document.getElementById('step4').classList.remove('active');
       document.getElementById('step1').classList.add('active');
+      form.style.display = 'none';
+      queryMode.style.display = 'block';
       chatMessages.innerHTML = '';
       init();
     }
@@ -447,7 +600,7 @@
       const loadingMsg = showLoadingMessage();
 
       try {
-        const response = await fetch('https://data-manager-two.vercel.app/api/quotations/submit', {
+        const response = await fetch(`${API_BASE}/chat/message`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -457,6 +610,7 @@
             email,
             projectDetails,
             estimatedBudget: budget,
+            type: 'quotation' // Indicate it's a quotation request
           }),
         });
 
@@ -466,7 +620,7 @@
           const data = await response.json();
           addBotMessage('✅ Your quotation request has been submitted! We\'ll review your project and send you a quotation to ' + email + ' within 24-48 hours.');
 
-          document.getElementById('quotationForm').style.display = 'none';
+          form.style.display = 'none';
           document.getElementById('successMessage').style.display = 'block';
           document.getElementById('quotationId').textContent = data.quotationId;
         } else {
@@ -475,7 +629,7 @@
       } catch (error) {
         loadingMsg.remove();
         addBotMessage('❌ Sorry, something went wrong. Please try again later.');
-        document.getElementById('quotationForm').style.display = 'none';
+        form.style.display = 'none';
         document.getElementById('errorMessage').style.display = 'block';
         document.getElementById('errorText').textContent = error.message;
       }
@@ -483,6 +637,13 @@
 
     closeBtn.addEventListener('click', () => {
       document.getElementById('chatbotWidget').style.display = 'none';
+    });
+
+    // Allow Enter key to send query
+    userQueryInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        sendQuery();
+      }
     });
 
     // Initialize on load
