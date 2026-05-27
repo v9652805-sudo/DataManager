@@ -1,5 +1,6 @@
 const { Router } = require("express");
 const Quotation = require("../models/quotation");
+const Project = require("../models/project");
 const router = Router();
 
 // Serve chatbot widget
@@ -10,49 +11,103 @@ router.get("/widget", (req, res) => {
 // Handle chatbot messages and quotation submission
 router.post("/message", async (req, res) => {
   try {
-    const { name, email, projectDetails, estimatedBudget } = req.body;
+    const { name, email, projectDetails, estimatedBudget, type, message } = req.body;
 
-    // Validate required fields
-    if (!name || !email || !projectDetails) {
-      return res.status(400).json({
-        success: false,
-        message: "Name, email, and project details are required",
+    // Handle Quotation Request (type: 'quotation')
+    if (type === 'quotation') {
+      // Validate required fields
+      if (!name || !email || !projectDetails) {
+        return res.status(400).json({
+          success: false,
+          message: "Name, email, and project details are required",
+        });
+      }
+
+      // Validate email format
+      const emailRegex = /^\S+@\S+\.\S+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({
+          success: false,
+          message: "Please provide a valid email address",
+        });
+      }
+
+      // Create quotation in database
+      const quotation = new Quotation({
+        name,
+        email,
+        projectDetails,
+        estimatedBudget: estimatedBudget || 0,
+        status: "pending",
+      });
+
+      await quotation.save();
+
+      // Return success response
+      return res.status(201).json({
+        success: true,
+        message: "Your quotation request has been submitted successfully!",
+        quotationId: quotation._id,
+        data: {
+          id: quotation._id,
+          status: quotation.status,
+          submittedAt: quotation.submittedAt,
+        },
       });
     }
 
-    // Validate email format
-    const emailRegex = /^\S+@\S+\.\S+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({
-        success: false,
-        message: "Please provide a valid email address",
+    // Handle General Query (type: 'general')
+    if (type === 'general' && message) {
+      const lowerMessage = message.toLowerCase();
+      let reply = "";
+      let projects = null;
+
+      // Check if query is about projects
+      if (
+        lowerMessage.includes('project') ||
+        lowerMessage.includes('portfolio') ||
+        lowerMessage.includes('work') ||
+        lowerMessage.includes('show me')
+      ) {
+        projects = await Project.find().limit(5);
+        reply = `I found ${projects.length} projects in our portfolio. Here are the details fetched from the database.`;
+      }
+      // Check if query is about skills
+      else if (
+        lowerMessage.includes('skill') ||
+        lowerMessage.includes('expertise') ||
+        lowerMessage.includes('experience')
+      ) {
+        reply = "For detailed information about our skills, please visit the skills section of our website.";
+      }
+      // Check if query is about quotation
+      else if (
+        lowerMessage.includes('quotation') ||
+        lowerMessage.includes('quote') ||
+        lowerMessage.includes('price') ||
+        lowerMessage.includes('cost') ||
+        lowerMessage.includes('estimate')
+      ) {
+        reply = "I can help you with a quotation. Let me collect some details from you!";
+      }
+      // Default response
+      else {
+        reply = "Thank you for your question. How can I assist you today?";
+      }
+
+      return res.status(200).json({
+        success: true,
+        reply,
+        projects: projects || null,
       });
     }
 
-    // Create quotation in database
-    const quotation = new Quotation({
-      name,
-      email,
-      projectDetails,
-      estimatedBudget: estimatedBudget || 0,
-      status: "pending",
-    });
-
-    await quotation.save();
-
-    // Return success response
-    res.status(201).json({
-      success: true,
-      message: "Your quotation request has been submitted successfully!",
-      quotationId: quotation._id,
-      data: {
-        id: quotation._id,
-        status: quotation.status,
-        submittedAt: quotation.submittedAt,
-      },
+    return res.status(400).json({
+      success: false,
+      message: "Invalid request type",
     });
   } catch (error) {
-    console.error("Error processing quotation:", error);
+    console.error("Error processing request:", error);
     res.status(500).json({
       success: false,
       message: "An error occurred while processing your request. Please try again later.",
